@@ -28,11 +28,23 @@ Route::get('/calendar', function () { return Inertia::render('Events/Index'); })
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
-    Route::post('/admin/matches', [MatchController::class, 'store'])->name('admin.matches.store');
-    Route::put('/admin/matches/{match}', [MatchController::class, 'update'])->name('admin.matches.update');
+    Route::get('/admin/teams', [AdminController::class, 'teams'])->name('admin.teams.index');
+    Route::post('/admin/teams', [TeamController::class, 'store'])->name('admin.teams.store');
+    
+    Route::get('/admin/players', [AdminController::class, 'players'])->name('admin.players.index');
     Route::post('/admin/players', [PlayerController::class, 'store'])->name('admin.players.store');
     Route::put('/admin/players/{player}', [PlayerController::class, 'update'])->name('admin.players.update');
     Route::delete('/admin/players/{player}', [PlayerController::class, 'destroy'])->name('admin.players.destroy');
+    
+    Route::get('/admin/matches', [AdminController::class, 'matches'])->name('admin.matches.index');
+    Route::get('/admin/matches/{match}', [AdminController::class, 'manageMatch'])->name('admin.matches.show');
+    Route::post('/admin/matches', [MatchController::class, 'store'])->name('admin.matches.store');
+    Route::put('/admin/matches/{match}', [MatchController::class, 'update'])->name('admin.matches.update');
+    
+    Route::get('/admin/events', [AdminController::class, 'events'])->name('admin.events.index');
+    Route::post('/admin/events', [AdminController::class, 'storeEvent'])->name('admin.events.store');
+    
+    Route::get('/admin/history', [AdminController::class, 'history'])->name('admin.history.index');
 });
 
 require __DIR__.'/settings.php';

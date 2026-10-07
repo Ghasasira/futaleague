@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, FolderGit2, LayoutGrid, Users, Trophy, Calendar, Shield, History } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -21,6 +21,31 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Teams Management',
+        href: '/admin/teams',
+        icon: Shield,
+    },
+    {
+        title: 'Players Management',
+        href: '/admin/players',
+        icon: Users,
+    },
+    {
+        title: 'Matches & Lineups',
+        href: '/admin/matches',
+        icon: Trophy,
+    },
+    {
+        title: 'Events Calendar',
+        href: '/admin/events',
+        icon: Calendar,
+    },
+    {
+        title: 'League History',
+        href: '/admin/history',
+        icon: History,
     },
 ];
 

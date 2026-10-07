@@ -174,7 +174,7 @@ export const PlayerDetailPageView: React.FC<PlayerDetailPageViewProps> = ({
               Form Rating
             </span>
             <span className="font-mono text-3xl font-black text-amber-400">
-              ★ {player.formRating.toFixed(1)}
+              ★ {(player.formRating || 0).toFixed(1)}
             </span>
             <span className="text-[10px] text-slate-500 block mt-1">Apex League Index</span>
           </div>
@@ -561,7 +561,7 @@ export const PlayerDetailPageView: React.FC<PlayerDetailPageViewProps> = ({
                       {log.assists > 0 ? `🎯 ${log.assists}` : '0'}
                     </td>
                     <td className="py-3.5 px-4 text-center font-bold text-amber-400 text-sm">
-                      ★ {log.rating.toFixed(1)}
+                      ★ {(log.rating || 0).toFixed(1)}
                     </td>
                   </tr>
                 ))}
@@ -594,7 +594,7 @@ export const PlayerDetailPageView: React.FC<PlayerDetailPageViewProps> = ({
                 <h4 className="text-xs font-bold text-white truncate">{tm.name}</h4>
                 <span className="text-[10px] text-slate-400 font-mono uppercase">{tm.position}</span>
                 <span className="text-[10px] font-mono text-emerald-400 font-semibold block mt-0.5">
-                  ★ {tm.formRating.toFixed(1)}
+                  ★ {(tm.formRating || 0).toFixed(1)}
                 </span>
               </div>
             ))}

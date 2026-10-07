@@ -26,9 +26,13 @@ class MatchController extends Controller
     public function show(FootballMatch $match)
     {
         $match->load(['homeTeam', 'awayTeam', 'events.player']);
+        $teams = Team::all();
+        $players = Player::all();
         
         return Inertia::render('Matches/Show', [
             'match' => $match,
+            'teams' => $teams,
+            'players' => $players,
         ]);
     }
 
@@ -55,6 +59,14 @@ class MatchController extends Controller
             'away_score' => 'integer',
             'status' => 'string',
             'current_minute' => 'integer',
+            'home_lineup' => 'nullable|array',
+            'away_lineup' => 'nullable|array',
+            'stats' => 'nullable|array',
+            'venue' => 'nullable|string',
+            'referee' => 'nullable|string',
+            'weather' => 'nullable|string',
+            'attendance' => 'nullable|integer',
+            'mvp_player_id' => 'nullable|exists:players,id',
         ]);
 
         $match->update($validated);

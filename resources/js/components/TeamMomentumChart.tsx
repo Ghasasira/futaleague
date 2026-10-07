@@ -552,7 +552,7 @@ export const TeamMomentumChart: React.FC<TeamMomentumChartProps> = ({
                       {metricMode === 'POINTS'
                         ? `${pt.data.cumulativePoints} pts`
                         : metricMode === 'RATING'
-                        ? `★ ${pt.data.rating.toFixed(1)}`
+                        ? `★ ${(pt.data.rating || 0).toFixed(1)}`
                         : metricMode === 'GOAL_DIFF'
                         ? `${pt.data.goalDiff > 0 ? `+${pt.data.goalDiff}` : pt.data.goalDiff}`
                         : `${pt.data.teamXG.toFixed(2)} xG`}
@@ -655,7 +655,7 @@ export const TeamMomentumChart: React.FC<TeamMomentumChartProps> = ({
               <div className="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 text-center">
                 <span className="text-[10px] text-slate-400 uppercase block">Rating</span>
                 <span className="font-mono font-bold text-emerald-400 text-sm">
-                  ★ {activeMatch.rating.toFixed(1)}
+                  ★ {(activeMatch.rating || 0).toFixed(1)}
                 </span>
               </div>
 

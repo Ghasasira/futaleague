@@ -114,7 +114,7 @@ export const PlayerModal: React.FC<PlayerModalProps> = ({
             </div>
             <div className="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
               <span className="font-mono font-bold text-purple-400 text-base block">
-                ★ {player.formRating.toFixed(1)}
+                ★ {(player.formRating || 0).toFixed(1)}
               </span>
               <span className="text-[10px] text-slate-500 uppercase">Form</span>
             </div>

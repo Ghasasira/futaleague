@@ -17,6 +17,8 @@ void createInertiaApp({
             case name.startsWith('Players/'):
             case name.startsWith('Standings/'):
             case name.startsWith('Teams/'):
+            case name.startsWith('History/'):
+            case name.startsWith('Events/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;

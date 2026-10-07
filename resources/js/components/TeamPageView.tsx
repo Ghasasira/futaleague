@@ -293,7 +293,7 @@ export const TeamPageView: React.FC<TeamPageViewProps> = ({
                   </div>
 
                   <span className="text-xs font-mono font-bold text-emerald-400">
-                    ★ {player.formRating.toFixed(1)}
+                    ★ {(player.formRating || 0).toFixed(1)}
                   </span>
                 </div>
 

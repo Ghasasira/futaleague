@@ -7,39 +7,32 @@ import { EmptyState } from '@/components/EmptyState';
 import { CalendarOff } from 'lucide-react';
 
 interface Props {
-    matches: Match[];
+    match: Match;
     teams: Team[];
     players: Player[];
 }
 
-export default function Index({ matches, teams, players }: Props) {
-    // Determine the active match. Defaults to the first live or upcoming one.
-    const activeMatch = matches[0];
-
+export default function Show({ match, teams, players }: Props) {
     return (
         <WebsiteLayout title="Match Center">
-            <Head title="Matches" />
+            <Head title={`Match Center - ${match?.homeTeam?.shortName} vs ${match?.awayTeam?.shortName}`} />
             
-            {activeMatch ? (
+            {match ? (
                 <MatchCenterView 
-                    match={activeMatch}
+                    match={match}
                     teams={teams}
                     players={players}
                     isAdmin={false}
                     onUpdateMatch={() => {}}
                     onSelectTeam={() => {}}
                     onSelectPlayer={() => {}}
-                    onTriggerNotification={() => {}}
-                    onDispatchEmail={() => {}}
                 />
             ) : (
-                <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto">
-                    <EmptyState 
-                        title="No Matches Found" 
-                        description="There are no matches scheduled for this season yet."
-                        icon={CalendarOff}
-                    />
-                </div>
+                <EmptyState 
+                    title="Match Not Found" 
+                    description="The match you are looking for does not exist or has been removed."
+                    icon={CalendarOff}
+                />
             )}
         </WebsiteLayout>
     );

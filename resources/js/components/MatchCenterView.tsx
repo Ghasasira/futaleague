@@ -9,6 +9,7 @@ import {
 import { ClubCrest } from './ClubCrest';
 import { TacticalPitch } from './TacticalPitch';
 import { LiveMatchIngestionModal } from './LiveMatchIngestionModal';
+import { EmptyState } from './EmptyState';
 import {
   Clock,
   Play,
@@ -584,7 +585,7 @@ export const MatchCenterView: React.FC<MatchCenterViewProps> = ({
                 <div className="bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800 text-center">
                   <span className="text-[10px] text-slate-400 uppercase font-semibold block">Form Index</span>
                   <span className="font-mono font-bold text-amber-400 text-sm">
-                    ★ {mvpPlayer.formRating.toFixed(1)}
+                    ★ {(mvpPlayer.formRating || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800 text-center">
@@ -695,9 +696,12 @@ export const MatchCenterView: React.FC<MatchCenterViewProps> = ({
             </div>
 
             {sortedEvents.length === 0 ? (
-              <div className="p-8 text-center bg-slate-900/50 rounded-xl border border-slate-800 text-slate-500 text-sm">
-                No match events recorded yet. Kickoff approaching or use the Ingestion Console above.
-              </div>
+              <EmptyState 
+                title="No Events Recorded" 
+                description="No match events have been recorded yet. Kickoff might be approaching." 
+                icon={Calendar} 
+                className="col-span-full border-none shadow-none"
+              />
             ) : (
               <div className="space-y-3">
                 <AnimatePresence initial={false}>
@@ -875,221 +879,249 @@ export const MatchCenterView: React.FC<MatchCenterViewProps> = ({
       {/* TAB CONTENT 2: TACTICAL PITCH BOARD */}
       {activeTab === 'tactics' && (
         <div className="space-y-6">
-          <TacticalPitch
-            match={match}
-            homeTeam={homeTeam}
-            awayTeam={awayTeam}
-            allPlayers={players}
-            onSelectPlayer={onSelectPlayer}
-          />
+          {!match.homeLineup || !match.awayLineup ? (
+            <EmptyState 
+              title="Tactical Data Unavailable" 
+              description="Lineups and formations have not been confirmed for this match yet." 
+              icon={Shield} 
+            />
+          ) : (
+            <TacticalPitch
+              match={match}
+              homeTeam={homeTeam}
+              awayTeam={awayTeam}
+              allPlayers={players}
+              onSelectPlayer={onSelectPlayer}
+            />
+          )}
         </div>
       )}
 
       {/* TAB CONTENT 3: STATS COMPARISON */}
       {activeTab === 'stats' && (
         <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-5">
-          <div className="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-3">
-            <span className="font-bold text-slate-200 uppercase">{homeTeam.shortName}</span>
-            <span className="font-semibold uppercase tracking-wider">Official Match Statistics</span>
-            <span className="font-bold text-slate-200 uppercase">{awayTeam.shortName}</span>
-          </div>
-
-          {[
-            { label: 'Ball Possession (%)', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).possession[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).possession[1], isPercent: true },
-            { label: 'Expected Goals (xG)', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).xG[0].toFixed(2), away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).xG[1].toFixed(2), numHome: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).xG[0], numAway: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).xG[1] },
-            { label: 'Total Shots', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).shots[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).shots[1] },
-            { label: 'Shots on Target', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).shotsOnTarget[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).shotsOnTarget[1] },
-            { label: 'Pass Accuracy (%)', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).passAccuracy[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).passAccuracy[1], isPercent: true },
-            { label: 'Corner Kicks', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).corners[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).corners[1] },
-            { label: 'Fouls Committed', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).fouls[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).fouls[1] },
-            { label: 'Goalkeeper Saves', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).saves[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).saves[1] },
-            { label: 'Offsides', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).offsides[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).offsides[1] },
-            { label: 'Yellow Cards', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).yellowCards[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).yellowCards[1] },
-            { label: 'Red Cards', home: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).redCards[0], away: (match.stats || { possession: [50, 50], xG: [0, 0], shots: [0, 0], shotsOnTarget: [0, 0], passAccuracy: [0, 0], corners: [0, 0], fouls: [0, 0], saves: [0, 0], offsides: [0, 0], yellowCards: [0, 0], redCards: [0, 0] }).redCards[1] },
-          ].map((stat, idx) => {
-            const hVal = typeof stat.home === 'number' ? stat.home : Number(stat.home);
-            const aVal = typeof stat.away === 'number' ? stat.away : Number(stat.away);
-            const total = hVal + aVal || 1;
-            const hPct = (hVal / total) * 100;
-            const aPct = (aVal / total) * 100;
-
-            return (
-              <div key={idx} className="space-y-1.5">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-mono font-bold text-white text-sm tabular-nums w-12 text-left">
-                    {stat.home}
-                  </span>
-                  <span className="text-slate-400 font-medium">{stat.label}</span>
-                  <span className="font-mono font-bold text-white text-sm tabular-nums w-12 text-right">
-                    {stat.away}
-                  </span>
-                </div>
-                <div className="h-2 w-full bg-slate-800/80 rounded-full overflow-hidden flex">
-                  <div
-                    style={{
-                      width: `${hPct}%`,
-                      backgroundColor: homeTeam.crestColor,
-                    }}
-                    className="h-full transition-all duration-300"
-                  />
-                  <div
-                    style={{
-                      width: `${aPct}%`,
-                      backgroundColor: awayTeam.crestColor,
-                    }}
-                    className="h-full transition-all duration-300"
-                  />
-                </div>
+          {!match.stats ? (
+            <EmptyState 
+              title="Statistics Unavailable" 
+              description="Match statistics are not yet available for this fixture." 
+              icon={Sliders} 
+            />
+          ) : (
+            <>
+              <div className="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-3">
+                <span className="font-bold text-slate-200 uppercase">{homeTeam.shortName}</span>
+                <span className="font-semibold uppercase tracking-wider">Official Match Statistics</span>
+                <span className="font-bold text-slate-200 uppercase">{awayTeam.shortName}</span>
               </div>
-            );
-          })}
+
+              {[
+                { label: 'Ball Possession (%)', home: match.stats.possession[0], away: match.stats.possession[1], isPercent: true },
+                { label: 'Expected Goals (xG)', home: match.stats.xG[0].toFixed(2), away: match.stats.xG[1].toFixed(2), numHome: match.stats.xG[0], numAway: match.stats.xG[1] },
+                { label: 'Total Shots', home: match.stats.shots[0], away: match.stats.shots[1] },
+                { label: 'Shots on Target', home: match.stats.shotsOnTarget[0], away: match.stats.shotsOnTarget[1] },
+                { label: 'Pass Accuracy (%)', home: match.stats.passAccuracy[0], away: match.stats.passAccuracy[1], isPercent: true },
+                { label: 'Corner Kicks', home: match.stats.corners[0], away: match.stats.corners[1] },
+                { label: 'Fouls Committed', home: match.stats.fouls[0], away: match.stats.fouls[1] },
+                { label: 'Goalkeeper Saves', home: match.stats.saves[0], away: match.stats.saves[1] },
+                { label: 'Offsides', home: match.stats.offsides[0], away: match.stats.offsides[1] },
+                { label: 'Yellow Cards', home: match.stats.yellowCards[0], away: match.stats.yellowCards[1] },
+                { label: 'Red Cards', home: match.stats.redCards[0], away: match.stats.redCards[1] },
+              ].map((stat, idx) => {
+                const hVal = typeof stat.home === 'number' ? stat.home : Number(stat.home);
+                const aVal = typeof stat.away === 'number' ? stat.away : Number(stat.away);
+                const total = hVal + aVal || 1;
+                const hPct = (hVal / total) * 100;
+                const aPct = (aVal / total) * 100;
+
+                return (
+                  <div key={idx} className="space-y-1.5">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-mono font-bold text-white text-sm tabular-nums w-12 text-left">
+                        {stat.home}
+                      </span>
+                      <span className="text-slate-400 font-medium">{stat.label}</span>
+                      <span className="font-mono font-bold text-white text-sm tabular-nums w-12 text-right">
+                        {stat.away}
+                      </span>
+                    </div>
+                    <div className="h-2 w-full bg-slate-800/80 rounded-full overflow-hidden flex">
+                      <div
+                        style={{
+                          width: `${hPct}%`,
+                          backgroundColor: homeTeam.crestColor,
+                        }}
+                        className="h-full transition-all duration-300"
+                      />
+                      <div
+                        style={{
+                          width: `${aPct}%`,
+                          backgroundColor: awayTeam.crestColor,
+                        }}
+                        className="h-full transition-all duration-300"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
         </div>
       )}
 
       {/* TAB CONTENT 4: LINEUPS & SQUADS */}
       {activeTab === 'lineups' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Home Squad */}
-          <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <ClubCrest team={homeTeam} size="sm" />
-                <span className="font-bold text-white text-sm">{homeTeam.name}</span>
-              </div>
-              <span className="text-xs font-mono text-slate-400">{match.homeLineup.formation}</span>
+          {!match.homeLineup || !match.awayLineup ? (
+            <div className="col-span-1 md:col-span-2">
+                <EmptyState 
+                    title="Squad Rosters Unavailable" 
+                    description="Official lineups have not been announced for this match." 
+                    icon={Users} 
+                />
             </div>
+          ) : (
+            <>
+              {/* Home Squad */}
+              <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <ClubCrest team={homeTeam} size="sm" />
+                    <span className="font-bold text-white text-sm">{homeTeam.name}</span>
+                  </div>
+                  <span className="text-xs font-mono text-slate-400">{match.homeLineup.formation}</span>
+                </div>
 
-            <div>
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                Starting XI
-              </h4>
-              <div className="space-y-2">
-                {match.homeLineup.starters.map((starter) => {
-                  const goalsCount = getPlayerMatchGoals(starter.name, starter.playerId);
-                  return (
-                    <div
-                      key={starter.playerId}
-                      onClick={() => {
-                        const fullP = players.find((p) => p.id === starter.playerId);
-                        if (fullP && onSelectPlayer) onSelectPlayer(fullP);
-                      }}
-                      className="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 cursor-pointer transition-colors text-xs"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-5 text-center font-mono font-bold text-emerald-400">
-                          {starter.number}
-                        </span>
-                        <span className="font-semibold text-white">{starter.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {/* Animated Player Goal Tally in Squad Roster */}
-                        {goalsCount > 0 && (
-                          <AnimatePresence mode="popLayout" initial={false}>
-                            <motion.span
-                              key={`home-starter-tally-${starter.playerId}-${goalsCount}`}
-                              initial={{ scale: 1.6, color: '#10b981' }}
-                              animate={{ scale: 1, color: '#6ee7b7' }}
-                              transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                              className="font-mono font-bold text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded flex items-center gap-1 shadow-sm"
-                              title={`${goalsCount} goal(s) in this match`}
-                            >
-                              <span>⚽</span>
-                              <span>{goalsCount > 1 ? `x${goalsCount}` : '1'}</span>
-                            </motion.span>
-                          </AnimatePresence>
-                        )}
-                        {match.mvpPlayerId === starter.playerId && (
-                          <span className="inline-flex items-center gap-1 font-bold font-mono text-[10px] bg-gradient-to-r from-amber-500/25 to-yellow-500/10 text-amber-300 border border-amber-400/40 px-1.5 py-0.5 rounded shadow-sm">
-                            <Award className="w-3 h-3 text-amber-400" />
-                            <span>MVP</span>
-                          </span>
-                        )}
-                        <span className="text-[10px] text-slate-400 font-mono uppercase bg-slate-900 px-1.5 py-0.5 rounded">
-                          {starter.position}
-                        </span>
-                        {starter.rating && (
-                          <span className="font-mono text-emerald-400 font-bold">
-                            {starter.rating.toFixed(1)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                <div>
+                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Starting XI
+                  </h4>
+                  <div className="space-y-2">
+                    {match.homeLineup.starters.map((starter) => {
+                      const goalsCount = getPlayerMatchGoals(starter.name, starter.playerId);
+                      return (
+                        <div
+                          key={starter.playerId}
+                          onClick={() => {
+                            const fullP = players.find((p) => p.id === starter.playerId);
+                            if (fullP && onSelectPlayer) onSelectPlayer(fullP);
+                          }}
+                          className="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 cursor-pointer transition-colors text-xs"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-5 text-center font-mono font-bold text-emerald-400">
+                              {starter.number}
+                            </span>
+                            <span className="font-semibold text-white">{starter.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {goalsCount > 0 && (
+                              <AnimatePresence mode="popLayout" initial={false}>
+                                <motion.span
+                                  key={`home-starter-tally-${starter.playerId}-${goalsCount}`}
+                                  initial={{ scale: 1.6, color: '#10b981' }}
+                                  animate={{ scale: 1, color: '#6ee7b7' }}
+                                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                                  className="font-mono font-bold text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded flex items-center gap-1 shadow-sm"
+                                  title={`${goalsCount} goal(s) in this match`}
+                                >
+                                  <span>⚽</span>
+                                  <span>{goalsCount > 1 ? `x${goalsCount}` : '1'}</span>
+                                </motion.span>
+                              </AnimatePresence>
+                            )}
+                            {match.mvpPlayerId === starter.playerId && (
+                              <span className="inline-flex items-center gap-1 font-bold font-mono text-[10px] bg-gradient-to-r from-amber-500/25 to-yellow-500/10 text-amber-300 border border-amber-400/40 px-1.5 py-0.5 rounded shadow-sm">
+                                <Award className="w-3 h-3 text-amber-400" />
+                                <span>MVP</span>
+                              </span>
+                            )}
+                            <span className="text-[10px] text-slate-400 font-mono uppercase bg-slate-900 px-1.5 py-0.5 rounded">
+                              {starter.position}
+                            </span>
+                            {starter.rating && (
+                              <span className="font-mono text-emerald-400 font-bold">
+                                {(starter.rating || 0).toFixed(1)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Away Squad */}
-          <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <ClubCrest team={awayTeam} size="sm" />
-                <span className="font-bold text-white text-sm">{awayTeam.name}</span>
-              </div>
-              <span className="text-xs font-mono text-slate-400">{match.awayLineup.formation}</span>
-            </div>
+              {/* Away Squad */}
+              <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <ClubCrest team={awayTeam} size="sm" />
+                    <span className="font-bold text-white text-sm">{awayTeam.name}</span>
+                  </div>
+                  <span className="text-xs font-mono text-slate-400">{match.awayLineup.formation}</span>
+                </div>
 
-            <div>
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                Starting XI
-              </h4>
-              <div className="space-y-2">
-                {match.awayLineup.starters.map((starter) => {
-                  const goalsCount = getPlayerMatchGoals(starter.name, starter.playerId);
-                  return (
-                    <div
-                      key={starter.playerId}
-                      onClick={() => {
-                        const fullP = players.find((p) => p.id === starter.playerId);
-                        if (fullP && onSelectPlayer) onSelectPlayer(fullP);
-                      }}
-                      className="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 cursor-pointer transition-colors text-xs"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-5 text-center font-mono font-bold text-red-400">
-                          {starter.number}
-                        </span>
-                        <span className="font-semibold text-white">{starter.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {/* Animated Player Goal Tally in Squad Roster */}
-                        {goalsCount > 0 && (
-                          <AnimatePresence mode="popLayout" initial={false}>
-                            <motion.span
-                              key={`away-starter-tally-${starter.playerId}-${goalsCount}`}
-                              initial={{ scale: 1.6, color: '#f43f5e' }}
-                              animate={{ scale: 1, color: '#fda4af' }}
-                              transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                              className="font-mono font-bold text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-1.5 py-0.5 rounded flex items-center gap-1 shadow-sm"
-                              title={`${goalsCount} goal(s) in this match`}
-                            >
-                              <span>⚽</span>
-                              <span>{goalsCount > 1 ? `x${goalsCount}` : '1'}</span>
-                            </motion.span>
-                          </AnimatePresence>
-                        )}
-                        {match.mvpPlayerId === starter.playerId && (
-                          <span className="inline-flex items-center gap-1 font-bold font-mono text-[10px] bg-gradient-to-r from-amber-500/25 to-yellow-500/10 text-amber-300 border border-amber-400/40 px-1.5 py-0.5 rounded shadow-sm">
-                            <Award className="w-3 h-3 text-amber-400" />
-                            <span>MVP</span>
-                          </span>
-                        )}
-                        <span className="text-[10px] text-slate-400 font-mono uppercase bg-slate-900 px-1.5 py-0.5 rounded">
-                          {starter.position}
-                        </span>
-                        {starter.rating && (
-                          <span className="font-mono text-emerald-400 font-bold">
-                            {starter.rating.toFixed(1)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                <div>
+                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Starting XI
+                  </h4>
+                  <div className="space-y-2">
+                    {match.awayLineup.starters.map((starter) => {
+                      const goalsCount = getPlayerMatchGoals(starter.name, starter.playerId);
+                      return (
+                        <div
+                          key={starter.playerId}
+                          onClick={() => {
+                            const fullP = players.find((p) => p.id === starter.playerId);
+                            if (fullP && onSelectPlayer) onSelectPlayer(fullP);
+                          }}
+                          className="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 cursor-pointer transition-colors text-xs"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-5 text-center font-mono font-bold text-red-400">
+                              {starter.number}
+                            </span>
+                            <span className="font-semibold text-white">{starter.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {goalsCount > 0 && (
+                              <AnimatePresence mode="popLayout" initial={false}>
+                                <motion.span
+                                  key={`away-starter-tally-${starter.playerId}-${goalsCount}`}
+                                  initial={{ scale: 1.6, color: '#f43f5e' }}
+                                  animate={{ scale: 1, color: '#fda4af' }}
+                                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                                  className="font-mono font-bold text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-1.5 py-0.5 rounded flex items-center gap-1 shadow-sm"
+                                  title={`${goalsCount} goal(s) in this match`}
+                                >
+                                  <span>⚽</span>
+                                  <span>{goalsCount > 1 ? `x${goalsCount}` : '1'}</span>
+                                </motion.span>
+                              </AnimatePresence>
+                            )}
+                            {match.mvpPlayerId === starter.playerId && (
+                              <span className="inline-flex items-center gap-1 font-bold font-mono text-[10px] bg-gradient-to-r from-amber-500/25 to-yellow-500/10 text-amber-300 border border-amber-400/40 px-1.5 py-0.5 rounded shadow-sm">
+                                <Award className="w-3 h-3 text-amber-400" />
+                                <span>MVP</span>
+                              </span>
+                            )}
+                            <span className="text-[10px] text-slate-400 font-mono uppercase bg-slate-900 px-1.5 py-0.5 rounded">
+                              {starter.position}
+                            </span>
+                            {starter.rating && (
+                              <span className="font-mono text-emerald-400 font-bold">
+                                {(starter.rating || 0).toFixed(1)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       )}
 
@@ -1114,20 +1146,11 @@ export const MatchCenterView: React.FC<MatchCenterViewProps> = ({
 
           <div className="pt-4 border-t border-slate-800">
             <h3 className="text-sm font-bold text-white mb-3">Head-to-Head History</h3>
-            <div className="grid grid-cols-3 text-center text-xs bg-slate-950/70 p-4 rounded-xl border border-slate-800/80">
-              <div>
-                <span className="text-xl font-bold font-mono text-sky-400">14</span>
-                <p className="text-[11px] text-slate-400 mt-1">{homeTeam.shortName} Wins</p>
-              </div>
-              <div>
-                <span className="text-xl font-bold font-mono text-slate-300">8</span>
-                <p className="text-[11px] text-slate-400 mt-1">Draws</p>
-              </div>
-              <div>
-                <span className="text-xl font-bold font-mono text-red-400">12</span>
-                <p className="text-[11px] text-slate-400 mt-1">{awayTeam.shortName} Wins</p>
-              </div>
-            </div>
+            <EmptyState 
+              icon={Shield}
+              title="No Historical Matchups"
+              description={`There is no recorded head-to-head history between ${homeTeam.name} and ${awayTeam.name}.`}
+            />
           </div>
         </div>
       )}

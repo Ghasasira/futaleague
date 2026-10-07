@@ -32,18 +32,32 @@ export const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
   onSelectTeam,
 }) => {
   // Default to two marquee players if not provided
-  const defaultPlayerA = initialPlayerA || players.find((p) => p.name.includes('Vance')) || players[0];
+  const safePlayers = players || [];
+  
+  if (safePlayers.length < 2) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center bg-slate-900/40 border border-slate-800 border-dashed rounded-xl p-8 mt-4">
+          <ArrowRightLeft className="w-12 h-12 text-slate-700 mb-4" />
+          <h3 className="text-lg font-bold text-slate-300">Not Enough Data</h3>
+          <p className="text-sm text-slate-500 text-center max-w-sm mt-2">
+              At least two players are required to use the comparison tool.
+          </p>
+      </div>
+    );
+  }
+
+  const defaultPlayerA = initialPlayerA || safePlayers.find((p) => p.name.includes('Vance')) || safePlayers[0];
   const defaultPlayerB =
     initialPlayerB ||
-    players.find((p) => p.name.includes('Farouk')) ||
-    players.find((p) => p.id !== defaultPlayerA.id) ||
-    players[1];
+    safePlayers.find((p) => p.name.includes('Farouk')) ||
+    safePlayers.find((p) => p.id !== defaultPlayerA.id) ||
+    safePlayers[1];
 
   const [playerAId, setPlayerAId] = useState<string>(defaultPlayerA.id);
   const [playerBId, setPlayerBId] = useState<string>(defaultPlayerB.id);
 
-  const playerA = players.find((p) => p.id === playerAId) || players[0];
-  const playerB = players.find((p) => p.id === playerBId) || players[1];
+  const playerA = safePlayers.find((p) => p.id === playerAId) || safePlayers[0];
+  const playerB = safePlayers.find((p) => p.id === playerBId) || safePlayers[1];
 
   const teamA = teams.find((t) => t.id === playerA.teamId);
   const teamB = teams.find((t) => t.id === playerB.teamId);
@@ -233,7 +247,7 @@ export const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
               </div>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <span className="font-mono font-bold text-white text-xs">
-                  {playerA.marketValue} · ★ {playerA.formRating.toFixed(1)}
+                  {playerA.marketValue} · ★ {(playerA.formRating || 0).toFixed(1)}
                 </span>
                 {(playerA.injuryStatus === 'injured' || playerA.injuryStatus === 'out' || playerA.injuryStatus === 'doubtful' || playerA.status === 'injured') && (
                   <InjuryBadge
@@ -307,7 +321,7 @@ export const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
               </div>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <span className="font-mono font-bold text-white text-xs">
-                  {playerB.marketValue} · ★ {playerB.formRating.toFixed(1)}
+                  {playerB.marketValue} · ★ {(playerB.formRating || 0).toFixed(1)}
                 </span>
                 {(playerB.injuryStatus === 'injured' || playerB.injuryStatus === 'out' || playerB.injuryStatus === 'doubtful' || playerB.status === 'injured') && (
                   <InjuryBadge
@@ -331,7 +345,7 @@ export const PlayerComparisonView: React.FC<PlayerComparisonViewProps> = ({
         {renderMetricBar('Goals Scored', playerA.goals, playerB.goals)}
         {renderMetricBar('Assists Provided', playerA.assists, playerB.assists)}
         {renderMetricBar('Total Goal Contributions', playerA.goals + playerA.assists, playerB.goals + playerB.assists)}
-        {renderMetricBar('Form Rating', Number(playerA.formRating.toFixed(1)), Number(playerB.formRating.toFixed(1)))}
+        {renderMetricBar('Form Rating', Number((playerA.formRating || 0).toFixed(1)), Number((playerB.formRating || 0).toFixed(1)))}
         {renderMetricBar('Appearances', playerA.appearances, playerB.appearances)}
         {renderMetricBar('Minutes Played', playerA.minutesPlayed, playerB.minutesPlayed, false, "'")}
         {renderMetricBar('Clean Sheets', playerA.cleanSheets, playerB.cleanSheets)}

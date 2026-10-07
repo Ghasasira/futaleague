@@ -120,7 +120,7 @@ export const TacticalPitch: React.FC<TacticalPitchProps> = ({
           </span>
           {player.rating && (
             <span className="text-[9px] font-mono tabular-nums text-emerald-400 font-bold">
-              {player.rating.toFixed(1)}
+              {(player.rating || 0).toFixed(1)}
             </span>
           )}
         </div>

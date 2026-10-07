@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Player, Team } from '../types/league';
 import { ClubCrest } from './ClubCrest';
 import { InjuryBadge } from './InjuryBadge';
-import { Award, Zap, Shield, AlertTriangle, Star } from 'lucide-react';
+import { Award, Zap, Shield, AlertTriangle, Star, Users } from 'lucide-react';
+import { EmptyState } from './EmptyState';
 
 interface PlayerRankingsProps {
   players: Player[];
@@ -116,183 +117,196 @@ export const PlayerRankings: React.FC<PlayerRankingsProps> = ({
         </div>
       </div>
 
-      {/* Leaderboard Table Card */}
+      {(() => {
+        const listToRender = rankingCategory === 'goals'
+          ? topScorers
+          : rankingCategory === 'assists'
+          ? topAssists
+          : rankingCategory === 'cleansheets'
+          ? topKeepers
+          : rankingCategory === 'rating'
+          ? topRated
+          : mostCards;
+          
+        return (
       <div className="bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-slate-800 bg-slate-950/70 text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-4 w-12 text-center">Rank</th>
-                <th className="py-3 px-4">Player</th>
-                <th className="py-3 px-4">Club</th>
-                <th className="py-3 px-4 text-center">Apps</th>
-                {rankingCategory === 'goals' && (
-                  <>
-                    <th className="py-3 px-4 text-center font-bold text-emerald-400">Goals</th>
-                    <th className="py-3 px-4 text-center">Mins/Goal</th>
-                  </>
-                )}
-                {rankingCategory === 'assists' && (
-                  <>
-                    <th className="py-3 px-4 text-center font-bold text-sky-400">Assists</th>
-                    <th className="py-3 px-4 text-center">Goals Created</th>
-                  </>
-                )}
-                {rankingCategory === 'cleansheets' && (
-                  <>
-                    <th className="py-3 px-4 text-center font-bold text-amber-400">Clean Sheets</th>
-                    <th className="py-3 px-4 text-center">Form Rating</th>
-                  </>
-                )}
-                {rankingCategory === 'rating' && (
-                  <>
-                    <th className="py-3 px-4 text-center font-bold text-purple-400">Match Rating</th>
-                    <th className="py-3 px-4 text-center">Market Value</th>
-                  </>
-                )}
-                {rankingCategory === 'discipline' && (
-                  <>
-                    <th className="py-3 px-4 text-center font-bold text-amber-400">Yellows</th>
-                    <th className="py-3 px-4 text-center font-bold text-rose-400">Reds</th>
-                  </>
-                )}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
-              {(rankingCategory === 'goals'
-                ? topScorers
-                : rankingCategory === 'assists'
-                ? topAssists
-                : rankingCategory === 'cleansheets'
-                ? topKeepers
-                : rankingCategory === 'rating'
-                ? topRated
-                : mostCards
-              ).map((player, idx) => {
-                const team = getTeam(player.teamId);
-                const rank = idx + 1;
-                const minsPerGoal = player.goals > 0 ? Math.round(player.minutesPlayed / player.goals) : 0;
-
-                return (
-                  <tr
-                    key={player.id}
-                    onClick={() => onSelectPlayer(player)}
-                    className="hover:bg-slate-800/50 cursor-pointer transition-colors group"
-                  >
-                    <td className="py-3.5 px-4 text-center font-bold">
-                      {rank === 1 ? (
-                        <span className="text-amber-400">🥇 1</span>
-                      ) : rank === 2 ? (
-                        <span className="text-slate-300">🥈 2</span>
-                      ) : rank === 3 ? (
-                        <span className="text-amber-600">🥉 3</span>
-                      ) : (
-                        <span className="text-slate-500">{rank}</span>
-                      )}
-                    </td>
-
-                    <td className="py-3.5 px-4 font-sans">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-base">{player.flag}</span>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-white group-hover:text-emerald-400 transition-colors">
-                              {player.name}
-                            </span>
-                            {(player.injuryStatus === 'injured' || player.injuryStatus === 'out' || player.injuryStatus === 'doubtful' || player.status === 'injured') && (
-                              <InjuryBadge
-                                injuryStatus={player.injuryStatus || 'injured'}
-                                size="xs"
-                              />
-                            )}
-                          </div>
-                          <span className="text-[10px] text-slate-400 font-mono block">
-                            #{player.number} · {player.position}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="py-3.5 px-4 font-sans">
-                      {team && (
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectTeam(team.id);
-                          }}
-                          className="flex items-center gap-2 hover:underline"
-                        >
-                          <ClubCrest team={team} size="xs" />
-                          <span className="text-slate-300 font-medium">{team.shortName}</span>
-                        </div>
-                      )}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-center tabular-nums text-slate-400">
-                      {player.appearances}
-                    </td>
-
+          {listToRender.length > 0 ? (
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-800 bg-slate-950/70 text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+                    <th className="py-3 px-4 w-12 text-center">Rank</th>
+                    <th className="py-3 px-4">Player</th>
+                    <th className="py-3 px-4">Club</th>
+                    <th className="py-3 px-4 text-center">Apps</th>
                     {rankingCategory === 'goals' && (
                       <>
-                        <td className="py-3.5 px-4 text-center tabular-nums font-bold text-emerald-400 text-sm">
-                          {player.goals}
-                        </td>
-                        <td className="py-3.5 px-4 text-center tabular-nums text-slate-400">
-                          {minsPerGoal}'
-                        </td>
+                        <th className="py-3 px-4 text-center font-bold text-emerald-400">Goals</th>
+                        <th className="py-3 px-4 text-center">Mins/Goal</th>
                       </>
                     )}
-
                     {rankingCategory === 'assists' && (
                       <>
-                        <td className="py-3.5 px-4 text-center tabular-nums font-bold text-sky-400 text-sm">
-                          {player.assists}
-                        </td>
-                        <td className="py-3.5 px-4 text-center tabular-nums text-slate-400">
-                          {player.goals + player.assists}
-                        </td>
+                        <th className="py-3 px-4 text-center font-bold text-sky-400">Assists</th>
+                        <th className="py-3 px-4 text-center">Goals Created</th>
                       </>
                     )}
-
                     {rankingCategory === 'cleansheets' && (
                       <>
-                        <td className="py-3.5 px-4 text-center tabular-nums font-bold text-amber-400 text-sm">
-                          {player.cleanSheets}
-                        </td>
-                        <td className="py-3.5 px-4 text-center tabular-nums text-emerald-400">
-                          ★ {player.formRating.toFixed(1)}
-                        </td>
+                        <th className="py-3 px-4 text-center font-bold text-amber-400">Clean Sheets</th>
+                        <th className="py-3 px-4 text-center">Form Rating</th>
                       </>
                     )}
-
                     {rankingCategory === 'rating' && (
                       <>
-                        <td className="py-3.5 px-4 text-center tabular-nums font-bold text-purple-400 text-sm">
-                          ★ {player.formRating.toFixed(1)}
-                        </td>
-                        <td className="py-3.5 px-4 text-center tabular-nums text-slate-300">
-                          {player.marketValue}
-                        </td>
+                        <th className="py-3 px-4 text-center font-bold text-purple-400">Match Rating</th>
+                        <th className="py-3 px-4 text-center">Market Value</th>
                       </>
                     )}
-
                     {rankingCategory === 'discipline' && (
                       <>
-                        <td className="py-3.5 px-4 text-center tabular-nums font-bold text-amber-400">
-                          {player.yellowCards}
-                        </td>
-                        <td className="py-3.5 px-4 text-center tabular-nums font-bold text-rose-500">
-                          {player.redCards}
-                        </td>
+                        <th className="py-3 px-4 text-center font-bold text-amber-400">Yellows</th>
+                        <th className="py-3 px-4 text-center font-bold text-rose-400">Reds</th>
                       </>
                     )}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60 font-mono">
+                  {listToRender.map((player, idx) => {
+                    const team = getTeam(player.teamId);
+                    const rank = idx + 1;
+                    const minsPerGoal = player.goals > 0 ? Math.round(player.minutesPlayed / player.goals) : 0;
+
+                    return (
+                      <tr
+                        key={player.id}
+                        onClick={() => onSelectPlayer(player)}
+                        className="hover:bg-slate-800/50 cursor-pointer transition-colors group"
+                      >
+                        <td className="py-3.5 px-4 text-center font-bold">
+                          {rank === 1 ? (
+                            <span className="text-amber-400">🥇 1</span>
+                          ) : rank === 2 ? (
+                            <span className="text-slate-300">🥈 2</span>
+                          ) : rank === 3 ? (
+                            <span className="text-amber-600">🥉 3</span>
+                          ) : (
+                            <span className="text-slate-500">{rank}</span>
+                          )}
+                        </td>
+
+                        <td className="py-3.5 px-4 font-sans">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-base">{player.flag}</span>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-white group-hover:text-emerald-400 transition-colors">
+                                  {player.name}
+                                </span>
+                                {(player.injuryStatus === 'injured' || player.injuryStatus === 'out' || player.injuryStatus === 'doubtful' || player.status === 'injured') && (
+                                  <InjuryBadge
+                                    injuryStatus={player.injuryStatus || 'injured'}
+                                    size="xs"
+                                  />
+                                )}
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-mono block">
+                                #{player.number} · {player.position}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="py-3.5 px-4 font-sans">
+                          {team && (
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectTeam(team.id);
+                              }}
+                              className="flex items-center gap-2 hover:underline"
+                            >
+                              <ClubCrest team={team} size="xs" />
+                              <span className="text-slate-300 font-medium">{team.shortName}</span>
+                            </div>
+                          )}
+                        </td>
+
+                        <td className="py-3.5 px-4 text-center tabular-nums text-slate-400">
+                          {player.appearances}
+                        </td>
+
+                        {rankingCategory === 'goals' && (
+                          <>
+                            <td className="py-3.5 px-4 text-center tabular-nums font-bold text-emerald-400 text-sm">
+                              {player.goals}
+                            </td>
+                            <td className="py-3.5 px-4 text-center tabular-nums text-slate-400">
+                              {minsPerGoal}'
+                            </td>
+                          </>
+                        )}
+
+                        {rankingCategory === 'assists' && (
+                          <>
+                            <td className="py-3.5 px-4 text-center tabular-nums font-bold text-sky-400 text-sm">
+                              {player.assists}
+                            </td>
+                            <td className="py-3.5 px-4 text-center tabular-nums text-slate-400">
+                              {player.goals + player.assists}
+                            </td>
+                          </>
+                        )}
+
+                        {rankingCategory === 'cleansheets' && (
+                          <>
+                            <td className="py-3.5 px-4 text-center tabular-nums font-bold text-amber-400 text-sm">
+                              {player.cleanSheets}
+                            </td>
+                            <td className="py-3.5 px-4 text-center tabular-nums text-emerald-400">
+                              ★ {(player.formRating || 0).toFixed(1)}
+                            </td>
+                          </>
+                        )}
+
+                        {rankingCategory === 'rating' && (
+                          <>
+                            <td className="py-3.5 px-4 text-center tabular-nums font-bold text-purple-400 text-sm">
+                              ★ {(player.formRating || 0).toFixed(1)}
+                            </td>
+                            <td className="py-3.5 px-4 text-center tabular-nums text-slate-300">
+                              {player.marketValue}
+                            </td>
+                          </>
+                        )}
+
+                        {rankingCategory === 'discipline' && (
+                          <>
+                            <td className="py-3.5 px-4 text-center tabular-nums font-bold text-amber-400">
+                              {player.yellowCards}
+                            </td>
+                            <td className="py-3.5 px-4 text-center tabular-nums font-bold text-rose-500">
+                              {player.redCards}
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+          ) : (
+              <EmptyState 
+                  title="No Player Data" 
+                  description="There are no players qualifying for this ranking category yet." 
+                  icon={Users} 
+                  className="border-none shadow-none"
+              />
+          )}
         </div>
       </div>
+        );
+      })()}
     </div>
   );
 };
